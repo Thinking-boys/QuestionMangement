@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head th:include="layout :: htmlhead" th:with="title='问题管理'"></head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <!--头-->
+    <div th:replace="fragments/head :: header"></div>
+
+    <div class="layui-body" style="margin: 1%">
+
+        <form id="userSearch" class="layui-form layui-form-pane" method="post" action="" style="margin-top: 20px;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">问题标题</label>
+                <div class="layui-input-inline">
+                    <input id="uname" name="title" autocomplete="off" class="layui-input" type="text"/>
+                </div>
+                <label class="layui-form-label">所属用户</label>
+                <div class="layui-input-inline">
+                    <input id="umobile" name="user" autocomplete="off" class="layui-input" type="text"
+                    />
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">问题时间</label>
+                    <div class="layui-input-inline" style="width: 175px;">
+                        <input name="insertTimeStart" id="insertTimeStart" placeholder="yyyy-MM-dd" autocomplete="off"
+                               class="layui-input" type="text"/>
+                    </div>
+                    <div class="layui-form-mid">-</div>
+                    <div class="layui-input-inline" style="width: 175px;">
+                        <input name="insertTimeEnd" id="insertTimeEnd" placeholder="yyyy-MM-dd" autocomplete="off"
+                               class="layui-input" type="text"/>
+                    </div>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    <button class="layui-btn" lay-submit="" lay-filter="searchSubmit">提交</button>
+                </div>
+            </div>
+        </form>
+
+        <!--<hr class="layui-bg-blue"/>-->
+        <hr class="layui-bg-black"/>
+
+
+        <table id="questionList" lay-filter="userTable"></table>
+        <div style="display:none;" id="currentUser">
+            <shiro:principal property="id"></shiro:principal>
+        </div>
+
+        <script type="text/html" id="isDelete">
+            {{#  if(!d.isDelete){ }}
+            <input type="checkbox" name="{{d.username}}_{{d.version}}" value="{{d.id}}" lay-skin="switch"
+                   lay-text="删除|未删除" lay-filter="isDelete"/>
+            {{#  } else { }}
+            <input type="checkbox" name="{{d.username}}_{{d.version}}" value="{{d.id}}" lay-skin="switch"
+                   lay-text="删除|未删除" lay-filter="isDelete" checked="checked"/>
+            {{#  } }}
+        </script>
+
+        <script type="text/html" id="isTop">
+            {{#  if(!d.isTop){ }}
+            <input type="checkbox" name="{{d.username}}_{{d.version}}" value="{{d.id}}" lay-skin="switch"
+                   lay-text="置顶|未置顶" lay-filter="isTop"/>
+            {{#  } else { }}
+            <input type="checkbox" name="{{d.username}}_{{d.version}}" value="{{d.id}}" lay-skin="switch"
+                   lay-text="置顶|未置顶" lay-filter="isTop" checked="checked"/>
+            {{#  } }}
+        </script>
+
+        <script type="text/html" id="optBar">
+            <!--<a class="layui-btn layui-btn-xs" lay-event="answerQuestion">回答问题</a>-->
+            <!--{{#  if(d.del){ }}-->
+            <!--<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="recover">恢复</a>-->
+            <!--{{#  } else { }}-->
+            <!--<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>-->
+            <!--{{#  } }}-->
+        </script>
+    </div>
+
+
+    <!--底部-->
+    <div th:replace="fragments/footer :: footer"></div>
+    <script src="/js/dateUtils.js"></script>
+    <script src="/js/question/questionList.js"></script>
+
+</div>
+</body>
+</html>

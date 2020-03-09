@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wyait.manage.dao.WenDaUserDao">
+
+    <sql id="Allcolumn">
+        id,username,password,salt,head_url,status
+    </sql>
+
+
+    <select id="getUsers" resultType="com.wyait.manage.entity.UserResultDTO">
+        select
+        <include refid="Allcolumn"></include>
+        from users
+        <where>
+            <if test="wendaUserSearchDTO.username!=null and wendaUserSearchDTO.username!=''">
+                AND username like CONCAT(CONCAT('%',#{wendaUserSearchDTO.username}),
+                '%')
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <update id="updateDeleteStatus">
+		update users set status=#{isDelete}
+		where id=#{id}
+	</update>
+</mapper>

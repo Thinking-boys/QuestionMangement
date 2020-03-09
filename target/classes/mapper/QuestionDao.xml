@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wyait.manage.dao.QuestionDao">
+
+
+    <sql id="allColumn">
+        id,title,content,user_id,created_date,comment_count,like_count,grade,follow_count,is_delete,is_top
+    </sql>
+
+    <resultMap id="categoryByQuestionIdMap" type="com.wyait.manage.pojo.categoryQuestion">
+        <id column="id" property="id"/>
+        <id column="category_id" property="categoryId"/>
+        <result column="question_id" property="questionId"/>
+
+    </resultMap>
+
+    <resultMap id="categoryQuestionMap" type="com.wyait.manage.entity.CategoryQuestion">
+        <id column="category_id" property="id"/>
+        <result column="question_count" property="questionCount"/>
+        <result column="category_name" property="categoryName"/>
+    </resultMap>
+    <select id="getQuestions" resultType="com.wyait.manage.entity.QuestionDTO">
+        select
+        <include refid="allColumn"></include>
+        from question
+        <where>
+            <if test="questionSearch.title!=null and questionSearch.title!=''">
+                AND title like CONCAT(CONCAT('%',#{questionSearch.title}),
+                '%')
+            </if>
+            <if test="questionSearch.user!=null and questionSearch.user!=''">
+                AND user_id =#{questionSearch.user}
+            </if>
+            <if
+                    test="questionSearch.insertTimeStart!=null and questionSearch.insertTimeStart!=''">
+                AND created_date &gt;= #{questionSearch.insertTimeStart}
+            </if>
+            <if test="questionSearch.insertTimeEnd!=null and questionSearch.insertTimeEnd!=''">
+                AND created_date &lt;= #{questionSearch.insertTimeEnd}
+            </if>
+        </where>
+        ORDER BY grade desc , created_date DESC
+    </select>
+
+    <select id="getQuestionById" resultType="com.wyait.manage.pojo.Question">
+        select
+        <include refid="allColumn"></include>
+        from question
+        where id=#{id}
+    </select>
+
+    <update id="updateDeleteStatus">
+		update question set is_delete=#{isDelete}
+		where id=#{id}
+	</update>
+
+    <update id="updateTopStatus">
+		update question set is_top=#{isTop}
+		where id=#{id}
+	</update>
+
+    <select id="getCategoryNameByQuestion" resultMap="categoryByQuestionIdMap">
+        select * from category_question where question_id=#{questionId}
+    </select>
+    <select id="getCategoryNameById" resultType="com.wyait.manage.pojo.Category">
+        select id,category_name from category
+        where id=#{id}
+    </select>
+
+    <select id="categoryQuestionCount" resultMap="categoryQuestionMap">
+        select * from (select category_id,count(question_id) as question_count from category_question
+        GROUP BY category_id ORDER BY question_count desc) t
+        inner join category
+        <where>
+            t.category_id=category.id
+            <if test="categoryName!=null and categoryName!=''">
+                AND category_name like CONCAT(CONCAT('%',#{categoryName}),
+                '%')
+            </if>
+        </where>
+        order by question_count desc
+    </select>
+
+    <insert id="addCategory">
+        insert into category(category_name) values (#{categoryName})
+    </insert>
+
+    <select id="getQuestionCountByUserId" resultType="integer">
+        select count(id) from question
+        where is_delete=0
+        group by user_id having user_id=#{userId}
+    </select>
+</mapper>

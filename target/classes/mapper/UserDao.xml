@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wyait.manage.dao.UserDao">
+
+
+	<sql id="Allcolumn">
+        id,username,password,salt,head_url
+    </sql>
+
+	<resultMap id="BaseResultMap" type="com.wyait.manage.pojo.Users" >
+		<id column="id" property="id"  />
+		<result column="username" property="username" />
+		<result column="password" property="password" />
+		<result column="salt" property="salt" />
+		<result column="head_url" property="headUrl" />
+	</resultMap>
+
+	<insert id="addOne" parameterType="com.wyait.manage.dao.UserDao">
+        INSERT INTO users(username,password,salt,head_url) VALUES (#{username},#{password},#{salt},#{headUrl})
+    </insert>
+
+	<select id="getUserById" resultType="com.wyait.manage.pojo.Users">
+		select <include refid="Allcolumn"></include>
+		from users
+		where id=#{userId}
+	</select>
+
+	<select id="getUsersByUsername" resultType="com.wyait.manage.pojo.Users">
+		select <include refid="Allcolumn"></include>
+		from users
+		where username=#{username}
+	</select>
+</mapper>

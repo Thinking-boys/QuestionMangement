@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.wyait.manage.dao.CommentDao">
+
+    <sql id="allColumn">
+        id,content,user_id,entity_id,entity_type,created_date,status
+    </sql>
+
+
+    <select id="getComments" resultType="com.wyait.manage.entity.CommentResultDTO">
+        select
+        <include refid="allColumn"></include>
+        from comment
+        <where>
+            <if test="commentSearchDTO.username!=null and commentSearchDTO.username!=''">
+                AND user_id =#{commentSearchDTO.username}
+            </if>
+            <if test="commentSearchDTO.questionId!=null and commentSearchDTO.questionId!=''">
+                AND entity_id =#{commentSearchDTO.questionId}
+            </if>
+            <if
+                    test="commentSearchDTO.insertTimeStart!=null and commentSearchDTO.insertTimeStart!=''">
+                AND created_date &gt;= #{commentSearchDTO.insertTimeStart}
+            </if>
+            <if test="commentSearchDTO.insertTimeEnd!=null and commentSearchDTO.insertTimeEnd!=''">
+                AND created_date &lt;= #{commentSearchDTO.insertTimeEnd}
+            </if>
+        </where>
+        ORDER BY created_date DESC
+    </select>
+
+    <select id="getCommentById" resultType="com.wyait.manage.pojo.Comment">
+        select
+        <include refid="allColumn"></include>
+        from comment where id=#{id} and entity_type=#{entityType}
+    </select>
+
+    <update id="updateDeleteStatus">
+		update comment set status=#{isDelete}
+		where id=#{id}
+	</update>
+    <select id="getCommentCountByUserId" resultType="integer">
+        select count(id) from comment
+        where status=0
+        group by user_id having user_id=#{userId}
+    </select>
+</mapper>
